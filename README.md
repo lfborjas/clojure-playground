@@ -1,36 +1,19 @@
-# clojure-playground
+# Clojure Playground
 
-FIXME: description
-
-## Installation
-
-Download from http://example.com/FIXME.
+One off namespaces playing around with some clojure concepts. Mostly from the 2nd Edition of [The Joy of Clojure](http://www.joyofclojure.com/).
 
 ## Usage
 
-FIXME: explanation
+Since these are one-off experiments, I mostly throw things in one namespace and interact with it from a CIDER repl in my Emacs, for example, for the Sudoku solver from Chapter 16 of the book:
 
-    $ java -jar clojure-playground-0.1.0-standalone.jar [args]
 
-## Options
 
-FIXME: listing of options this app accepts.
 
-## Examples
+### An Emacs aside
 
-...
+My current set of packages and colors is pretty much straight out of the [Clojure for the Brave and True](https://www.braveclojure.com/basic-emacs/) Emacs tutorial, as [packaged by the author](https://github.com/flyingmachine/emacs-for-clojure/). Caveat Emptor (?)
 
-### Bugs
+Using [CIDER](https://cider.readthedocs.io/en/latest/using_the_repl/) means that I can edit my functions in a file in one buffer, and run them in another. Some things to note:
 
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2018 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+* Upon start, CIDER will load the dependencies in the namespace's `project.clj`. If you add new dependencies, you'll want to `M-x cider-quit` and then call `M-x cider-jack-in` from a file in the projet. I believe `M-x cider-restart` should work as well
+* My workflow is usually: write or edit a function, run `C-c C-k` to compile the buffer (which saves the file, too) and then, if I'm not already there, run `C-c M-n` to switch the REPL's context to my current namespace. `M-p` is useful when going back to previous sexps, in case I've changed a function, and Paredit's slurp and barf help too (`C-)` and `C-}`, respectively).
