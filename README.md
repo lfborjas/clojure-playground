@@ -6,6 +6,7 @@ One off namespaces playing around with some clojure concepts. Mostly from the 2n
 
 Since these are one-off experiments, I mostly throw things in one namespace and interact with it from a CIDER repl in my Emacs, for example, for the Sudoku solver from Chapter 16 of the book:
 
+![image](https://user-images.githubusercontent.com/82133/46909158-e7733380-cefb-11e8-9eb7-b694fe697ab5.png)
 
 
 
