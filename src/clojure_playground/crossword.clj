@@ -223,6 +223,75 @@
               (for [x (vfn row)] [x col]))
             (seq pword))))
 
+(defn get-word-cells
+  "Given a crossword entry, determine the cells that belong to it; and map to its letters"
+  [entry]
+  (let [{[row col] :start
+         word :solution
+         dir :direction} entry
+         pword (prep-word word)
+         sz  (count pword)
+         vfn #(range % (+ % sz))]
+    (if (= :across dir)
+              ; if across, col varies, row stays the same; vice-versa
+              (for [x (vfn col)] [row x])
+              (for [x (vfn row)] [x col]))))
+
+
+(defn all-letters
+  "Given a crossword, determine which cells get which letters"
+  [crossword]
+  (into (hash-map)
+        (apply conj (map assign-cell-letters
+                         crossword))))
+
+(defn all-positions
+  "Given a size, generates all possible positions in a square board"
+  [size]
+  (for [x (range 0 size) y (range 0 size)] [x y]))
+
+(defn populate-cells
+  "Given maps for numbers and letters, and positions, assign"
+  [letter-map number-map all-cells]
+  (map #(into {} {:letter (get letter-map %)
+                  :number (get number-map %)
+                  :pos %})
+       all-cells))
+
+(defn prep
+  "Given a crossword, return a vector of vectors representing
+  all rows, with maps representing each cell's letter and number"
+  [crossword sz]
+  (let [number-map (all-numbers crossword)
+        letter-map (all-letters crossword)
+        all-cells  (all-positions sz)]
+    (partition sz (populate-cells letter-map number-map all-cells))))
+
+
+(defn cell-str [cell]
+  (let [letter (:letter cell)
+        number (:number cell)
+        number-str (if (some? number) (str "(" number ")") "")
+        letter-str (if (some? letter) (str letter) "@")
+        num-separator (if (> (count (str number)) 1) "" " ")]
+    (cond
+     (and letter number) (str number-str num-separator letter-str)
+     (nil? number) (str "    " letter-str ""))))
+
+;; TODO: make showing letters optional
+(defn print-puzzle
+  "ASCII-prints the given puzzle, with numbers and empty squares"
+  [puzzle]
+  (let [row-sep (apply str (repeat (* (count puzzle) 6) "-"))]
+    (println row-sep)
+    (dotimes [row (count puzzle)]
+      (print "|")
+      (doseq [cell (nth puzzle row)]
+        (print (str  (cell-str cell) "|")))
+      (println)
+      (println row-sep))))
+
+
 ;; the above yields some useful stuff:
 ;; clojure-playground.crossword> (assign-cell-letters (last (filter #(= (:direction %) :down) example-crossword)))
 ;; {[3 0] \M, [4 0] \U, [5 0] \S, [6 0] \E}
@@ -232,23 +301,6 @@
 ;; {[0 3] \S, [0 4] \N, [0 5] \A, [0 6] \P}
 ;; clojure-playground.crossword> 
 
-(defn all-letters
-  "Given a crossword, determine which cells get which letters"
-  [crossword]
-  (into (hash-map)
-        (apply conj (map assign-cell-letters
-                         crossword))))
-
-(defn prep
-  "Given a crossword, return a vector of vectors representing
-  all rows, with maps representing each cell's letter and number"
-  [crossword sz]
-  (let [number-map (all-numbers crossword)
-        letter-map (all-letters crossword)
-        all-cells (for [x (range 0 sz) y (range 0 sz)] [x y])]
-    (partition sz (map #(into {} {:letter (get letter-map %)
-                                  :number (get number-map %)})
-                       all-cells))))
 
 ;; prep pretty much does what we want:
 
@@ -278,28 +330,7 @@
 
 ;; now it's a matter of printing:
 
-(defn cell-str [cell]
-  (let [letter (:letter cell)
-        number (:number cell)
-        number-str (if (some? number) (str "(" number ")") "")
-        letter-str (if (some? letter) (str letter) "@")
-        num-separator (if (> (count (str number)) 1) "" " ")]
-    (cond
-     (and letter number) (str number-str num-separator letter-str)
-     (nil? number) (str "    " letter-str ""))))
 
-;; TODO: make showing letters optional
-(defn print-puzzle
-  "ASCII-prints the given puzzle, with numbers and empty squares"
-  [puzzle]
-  (let [row-sep (apply str (repeat (* (count puzzle) 6) "-"))]
-    (println row-sep)
-    (dotimes [row (count puzzle)]
-      (print "|")
-      (doseq [cell (nth puzzle row)]
-        (print (str  (cell-str cell) "|")))
-      (println)
-      (println row-sep))))
 
 ;; and voilà, an almost perfect ascii rendering of
 ;; the puzzle (note that we must give the size of the puzzle
